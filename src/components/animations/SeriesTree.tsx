@@ -20,22 +20,22 @@ const BookNode: React.FC<BookNodeProps> = ({
 }) => {
 	return (
 		<div
-			className={`book-node transition-all duration-300 ease-in-out p-4 rounded-lg border ${
+			className={`book-node transition-all duration-300 ease-in-out p-5 rounded-xl border ${
 				isActive
-					? "scale-105 shadow-lg border-primary"
-					: "scale-100 border-border"
+					? "scale-[1.02] shadow-lg border-primary/30 bg-accent/5"
+					: "scale-100 border-border hover:border-primary/20 hover:bg-muted/10"
 			}`}
 			onClick={onClick}
 			style={{ animationDelay: `${index * 0.1}s` }}
 		>
-			<div className="flex items-center gap-4">
-				<div className="w-16 h-24 bg-muted flex items-center justify-center overflow-hidden rounded">
+			<div className="flex items-center gap-5">
+				<div className="w-20 h-28 bg-muted/30 flex items-center justify-center overflow-hidden rounded-lg shadow-sm">
 					{book.volumeInfo.imageLinks?.thumbnail ? (
 						<Image
 							src={book.volumeInfo.imageLinks.thumbnail}
 							alt={book.volumeInfo.title}
-							width={64}
-							height={96}
+							width={80}
+							height={112}
 							className="w-full h-full object-cover"
 						/>
 					) : (
@@ -44,25 +44,42 @@ const BookNode: React.FC<BookNodeProps> = ({
 						</span>
 					)}
 				</div>
-				<div>
-					<h3 className="font-medium">{book.volumeInfo.title}</h3>
-					<p className="text-sm text-muted-foreground">
-						{book.volumeInfo.publishedDate?.split("-")[0] || "Unknown date"}
-					</p>
+				<div className="flex-1">
+					<h3 className="font-medium text-base leading-tight mb-1">
+						{book.volumeInfo.title}
+					</h3>
+					<div className="flex items-center gap-3 mb-1">
+						<p className="text-sm text-muted-foreground">
+							{book.volumeInfo.publishedDate?.split("-")[0] || "Unknown date"}
+						</p>
+						{book.volumeInfo.averageRating && (
+							<div className="flex items-center text-accent">
+								<span className="text-sm mr-1">★</span>
+								<span className="text-xs text-muted-foreground">
+									{book.volumeInfo.averageRating.toFixed(1)}
+								</span>
+							</div>
+						)}
+					</div>
+					{book.volumeInfo.authors && (
+						<p className="text-sm text-muted-foreground">
+							by {book.volumeInfo.authors.join(", ")}
+						</p>
+					)}
 				</div>
 			</div>
 
 			{isActive && (
-				<div className="book-details mt-4 transition-all duration-300 ease-in-out opacity-100 h-auto">
-					<p className="text-sm mb-2">
-						{book.volumeInfo.description?.substring(0, 150)}
+				<div className="book-details mt-5 pt-5 border-t border-border/50 transition-all duration-300 ease-in-out opacity-100 h-auto">
+					<p className="text-sm mb-4 leading-relaxed text-muted-foreground">
+						{book.volumeInfo.description?.substring(0, 200)}
 						{book.volumeInfo.description &&
-						book.volumeInfo.description.length > 150
+						book.volumeInfo.description.length > 200
 							? "..."
 							: ""}
 					</p>
 					<div className="flex justify-end">
-						<Button variant="outline" size="sm">
+						<Button variant="outline" size="sm" className="text-xs">
 							View Details
 						</Button>
 					</div>
@@ -86,7 +103,9 @@ export function SeriesTree({ books, className = "" }: SeriesTreeProps) {
 
 	if (!books || books.length === 0) {
 		return (
-			<div className="text-center py-8">No books found in this series.</div>
+			<div className="text-center py-12 bg-muted/20 rounded-xl">
+				<p className="text-muted-foreground">No books found in this series.</p>
+			</div>
 		);
 	}
 
@@ -96,7 +115,7 @@ export function SeriesTree({ books, className = "" }: SeriesTreeProps) {
 				{books.map((book, index) => (
 					<div key={book.id} className="relative">
 						{index > 0 && (
-							<div className="absolute left-8 -top-4 w-0.5 h-4 bg-border"></div>
+							<div className="absolute left-10 -top-4 w-0.5 h-4 bg-border"></div>
 						)}
 						<BookNode
 							book={book}

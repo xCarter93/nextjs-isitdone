@@ -2,8 +2,7 @@
 
 import React from "react";
 import { BookVolume } from "@/lib/api/googleBooks";
-import { BookCard } from "./BookCard";
-import { FadeIn } from "@/components/animations/FadeIn";
+import { BookCard } from "@/components/search/BookCard";
 
 interface SearchResultsProps {
 	results: BookVolume[];
@@ -46,7 +45,7 @@ export function SearchResults({
 		);
 	}
 
-	if (results.length === 0) {
+	if (!results || results.length === 0) {
 		return (
 			<div className="w-full py-12 text-center">
 				<h3 className="text-xl font-semibold mb-2">No results found</h3>
@@ -59,12 +58,14 @@ export function SearchResults({
 
 	return (
 		<div className="w-full py-8">
-			<h2 className="text-2xl font-semibold mb-6">Search Results</h2>
+			<h2 className="text-2xl font-semibold mb-6">
+				Search Results ({results.length})
+			</h2>
 			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-				{results.map((book, index) => (
-					<FadeIn key={book.id} delay={index * 0.05} direction="up">
+				{results.map((book) => (
+					<div key={book.id}>
 						<BookCard book={book} />
-					</FadeIn>
+					</div>
 				))}
 			</div>
 		</div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Moon, Sun } from "lucide-react";
+import { Menu, Moon, Sun, Search, BookOpen } from "lucide-react";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,16 +23,18 @@ export function Header() {
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
 				<div className="flex items-center gap-2">
 					<Link href="/" className="flex items-center gap-2">
-						<span className="text-xl font-bold">IsItDone</span>
+						<BookOpen className="h-6 w-6 text-primary" />
+						<span className="text-xl font-medium tracking-tight">IsItDone</span>
 					</Link>
 				</div>
 
 				{/* Desktop Navigation */}
-				<nav className="hidden md:flex items-center gap-6">
+				<nav className="hidden md:flex items-center gap-8">
 					<Link
 						href="/search"
-						className="text-sm font-medium transition-colors hover:text-primary"
+						className="flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary"
 					>
+						<Search className="h-4 w-4" />
 						Search
 					</Link>
 					<Link
@@ -48,15 +50,15 @@ export function Header() {
 						About
 					</Link>
 					<Button
-						variant="ghost"
+						variant="outline"
 						size="icon"
 						onClick={toggleTheme}
-						className="rounded-full"
+						className="rounded-full border-border/60 ml-2"
 					>
 						{theme === "dark" ? (
-							<Sun className="h-5 w-5" />
+							<Sun className="h-4 w-4" />
 						) : (
-							<Moon className="h-5 w-5" />
+							<Moon className="h-4 w-4" />
 						)}
 						<span className="sr-only">Toggle theme</span>
 					</Button>
@@ -64,35 +66,59 @@ export function Header() {
 
 				{/* Mobile Navigation */}
 				<div className="flex md:hidden items-center gap-4">
+					<Link
+						href="/search"
+						className="flex items-center justify-center h-9 w-9 rounded-full bg-muted/30"
+					>
+						<Search className="h-4 w-4" />
+						<span className="sr-only">Search</span>
+					</Link>
 					<Button
-						variant="ghost"
+						variant="outline"
 						size="icon"
 						onClick={toggleTheme}
-						className="rounded-full"
+						className="rounded-full border-border/60"
 					>
 						{theme === "dark" ? (
-							<Sun className="h-5 w-5" />
+							<Sun className="h-4 w-4" />
 						) : (
-							<Moon className="h-5 w-5" />
+							<Moon className="h-4 w-4" />
 						)}
 						<span className="sr-only">Toggle theme</span>
 					</Button>
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" size="icon" className="rounded-full">
-								<Menu className="h-5 w-5" />
+							<Button
+								variant="outline"
+								size="icon"
+								className="rounded-full border-border/60"
+							>
+								<Menu className="h-4 w-4" />
 								<span className="sr-only">Open menu</span>
 							</Button>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							<DropdownMenuItem asChild>
-								<Link href="/search">Search</Link>
+						<DropdownMenuContent
+							align="end"
+							className="w-[180px] rounded-xl p-2"
+						>
+							<DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+								<Link href="/search" className="flex items-center gap-2 py-2">
+									<Search className="h-4 w-4" />
+									Search
+								</Link>
 							</DropdownMenuItem>
-							<DropdownMenuItem asChild>
-								<Link href="/recommendations">Recommendations</Link>
+							<DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+								<Link
+									href="/recommendations"
+									className="flex items-center gap-2 py-2"
+								>
+									Recommendations
+								</Link>
 							</DropdownMenuItem>
-							<DropdownMenuItem asChild>
-								<Link href="/about">About</Link>
+							<DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+								<Link href="/about" className="flex items-center gap-2 py-2">
+									About
+								</Link>
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

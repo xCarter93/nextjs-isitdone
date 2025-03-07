@@ -13,6 +13,18 @@ interface BookCardProps {
 export function BookCard({ book }: BookCardProps) {
 	const { volumeInfo } = book;
 
+	// Handle case where volumeInfo is undefined
+	if (!volumeInfo) {
+		return (
+			<Card className="h-full overflow-hidden">
+				<CardContent className="p-4">
+					<h3 className="font-medium text-base mb-1">Missing Book Data</h3>
+					<p className="text-sm text-muted-foreground">ID: {book.id}</p>
+				</CardContent>
+			</Card>
+		);
+	}
+
 	// Extract year from published date if available
 	const publishedYear = volumeInfo.publishedDate
 		? volumeInfo.publishedDate.split("-")[0]
@@ -28,66 +40,64 @@ export function BookCard({ book }: BookCardProps) {
 		volumeInfo.imageLinks?.thumbnail ||
 		"https://via.placeholder.com/128x192?text=No+Cover";
 
+	// Calculate rating stars
+	const rating = volumeInfo.averageRating || 0;
+	const fullStars = Math.floor(rating);
+	const hasHalfStar = rating % 1 >= 0.5;
+
 	return (
 		<Link href={`/series/${book.id}`} className="block h-full">
-			<Card className="h-full transition-all duration-300 hover:shadow-md">
+			<Card className="h-full overflow-hidden transition-all duration-300 hover:shadow-md hover:translate-y-[-4px]">
+				<div className="relative pt-[150%] bg-muted/30">
+					<Image
+						src={coverImage}
+						alt={volumeInfo.title || "Book cover"}
+						fill
+						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+						className="object-cover"
+						priority
+					/>
+				</div>
+
 				<CardContent className="p-4">
-					<div className="aspect-[2/3] w-full bg-muted rounded overflow-hidden mb-4">
-						<Image
-							src={coverImage}
-							alt={volumeInfo.title}
-							width={128}
-							height={192}
-							className="w-full h-full object-cover"
-						/>
-					</div>
+					<h3 className="font-medium text-base line-clamp-2 mb-1 leading-tight">
+						{volumeInfo.title || "Untitled Book"}
+					</h3>
 
-					<h3 className="font-medium line-clamp-2 mb-1">{volumeInfo.title}</h3>
-
-					<p className="text-sm text-muted-foreground line-clamp-1 mb-2">
+					<p className="text-sm text-muted-foreground line-clamp-1 mb-3">
 						{authors}
 					</p>
 
-					<div className="flex items-center justify-between">
-						<span className="text-xs bg-muted px-2 py-1 rounded">
-							{publishedYear}
-						</span>
-
-						{volumeInfo.averageRating && (
-							<span className="text-xs flex items-center">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 24 24"
-									fill="currentColor"
-									className="w-4 h-4 text-yellow-500 mr-1"
-								>
-									<path
-										fillRule="evenodd"
-										d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
-										clipRule="evenodd"
-									/>
-								</svg>
-								{volumeInfo.averageRating.toFixed(1)}
-							</span>
-						)}
-					</div>
-				</CardContent>
-
-				<CardFooter className="p-4 pt-0">
-					<div className="w-full">
-						{volumeInfo.categories && volumeInfo.categories.length > 0 && (
-							<div className="flex flex-wrap gap-1">
-								{volumeInfo.categories.slice(0, 2).map((category, index) => (
-									<span
-										key={index}
-										className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full"
-									>
-										{category}
+					{rating > 0 && (
+						<div className="flex items-center mb-2">
+							<div className="flex text-accent mr-2">
+								{[...Array(5)].map((_, i) => (
+									<span key={i} className="text-lg">
+										{i < fullStars
+											? "★"
+											: i === fullStars && hasHalfStar
+											? "⯨"
+											: "☆"}
 									</span>
 								))}
 							</div>
-						)}
-					</div>
+							<span className="text-xs text-muted-foreground">
+								{rating.toFixed(1)}
+							</span>
+						</div>
+					)}
+				</CardContent>
+
+				<CardFooter className="px-4 py-3 border-t border-border/50 bg-muted/10 flex justify-between items-center">
+					<span className="text-xs font-medium text-muted-foreground">
+						{publishedYear}
+					</span>
+
+					{volumeInfo.categories && volumeInfo.categories.length > 0 && (
+						<span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
+							{volumeInfo.categories[0]}
+						</span>
+					)}
 				</CardFooter>
 			</Card>
 		</Link>

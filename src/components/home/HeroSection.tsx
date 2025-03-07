@@ -1,6 +1,6 @@
 "use client";
 
-import { SearchBar } from "@/components/search/SearchBar";
+import { SearchForm } from "@/components/search/SearchForm";
 import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
@@ -21,7 +21,7 @@ export function HeroSection() {
 					className="mt-10 w-full max-w-2xl animate-fade-in-up"
 					style={{ animationDelay: "0.2s" }}
 				>
-					<SearchBar />
+					<SearchForm />
 				</div>
 				<div
 					className="mt-10 flex flex-col sm:flex-row gap-4 animate-fade-in-up"

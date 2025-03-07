@@ -26,17 +26,17 @@ export function SearchBar({ className = "" }: { className?: string }) {
 			className={`relative w-full max-w-2xl ${className}`}
 		>
 			<div className="relative flex items-center">
-				<Search className="absolute left-3 h-5 w-5 text-muted-foreground pointer-events-none" />
+				<Search className="absolute left-4 h-4 w-4 text-muted-foreground pointer-events-none" />
 				<Input
 					type="text"
 					value={query}
 					onChange={(e) => setQuery(e.target.value)}
 					placeholder="Search for book series..."
-					className="h-12 w-full rounded-full pl-10 pr-24"
+					className="h-12 w-full rounded-full pl-11 pr-28 border-border/60 bg-muted/10 focus:bg-background focus:border-primary/30 focus:ring-primary/20 transition-colors"
 				/>
 				<Button
 					type="submit"
-					className="absolute right-1 rounded-full px-4 h-10"
+					className="absolute right-1.5 rounded-full px-5 h-9 text-sm font-medium shadow-sm"
 					disabled={!query.trim()}
 				>
 					Search

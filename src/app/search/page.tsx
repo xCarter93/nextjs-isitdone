@@ -1,14 +1,87 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { SearchBar } from "@/components/search/SearchBar";
+import { useState, useEffect, useCallback } from "react";
+import { SearchForm } from "@/components/search/SearchForm";
 import { SearchFilters } from "@/components/search/SearchFilters";
+import { SearchResults } from "@/components/search/SearchResults";
 import { Suspense } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+	BookVolume,
+	SearchFilters as ApiSearchFilters,
+} from "@/lib/api/googleBooks";
+import { searchBooks } from "@/lib/actions/bookActions";
 
 function SearchContent() {
 	const searchParams = useSearchParams();
 	const query = searchParams.get("q") || "";
+
+	const [results, setResults] = useState<BookVolume[]>([]);
+	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [filters, setFilters] = useState<ApiSearchFilters>({
+		genre: [],
+		yearStart: undefined,
+		yearEnd: undefined,
+		isComplete: undefined,
+	});
+
+	// Function to perform search with current filters - memoized to prevent recreating on every render
+	const performSearch = useCallback(
+		async (searchQuery: string, searchFilters: ApiSearchFilters) => {
+			if (!searchQuery) return;
+
+			setIsLoading(true);
+			setError(null);
+
+			try {
+				const books = await searchBooks(searchQuery, searchFilters);
+				setResults(books);
+			} catch (err) {
+				console.error("Error fetching books:", err);
+				setError("Failed to fetch books. Please try again later.");
+			} finally {
+				setIsLoading(false);
+			}
+		},
+		[]
+	);
+
+	// Handle search results from the SearchForm component
+	const handleSearchResults = useCallback(
+		(
+			searchResults: BookVolume[],
+			searchIsLoading: boolean,
+			searchError: string | null
+		) => {
+			setResults(searchResults);
+			setIsLoading(searchIsLoading);
+			setError(searchError);
+		},
+		[]
+	);
+
+	// Handle filter changes
+	const handleFilterChange = useCallback(
+		(newFilters: ApiSearchFilters) => {
+			setFilters(newFilters);
+			// When filters change, perform a new search with current query
+			if (query) {
+				performSearch(query, newFilters);
+			}
+		},
+		[query, performSearch]
+	);
+
+	// Initial search when component mounts or query changes
+	useEffect(() => {
+		if (query) {
+			// Use the current filters state for the initial search
+			performSearch(query, filters);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [query, performSearch]); // Intentionally excluding filters to prevent infinite loops
 
 	return (
 		<section className="py-10 w-full">
@@ -18,7 +91,11 @@ function SearchContent() {
 				</h1>
 
 				<div className="mb-8">
-					<SearchBar />
+					<SearchForm
+						initialQuery={query}
+						filters={filters}
+						onSearchResults={handleSearchResults}
+					/>
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -27,7 +104,7 @@ function SearchContent() {
 						<Card>
 							<CardContent className="p-6">
 								<h2 className="text-xl font-semibold mb-4">Filters</h2>
-								<SearchFilters />
+								<SearchFilters onFilterChange={handleFilterChange} />
 							</CardContent>
 						</Card>
 					</div>
@@ -35,47 +112,11 @@ function SearchContent() {
 					{/* Search results */}
 					<div className="md:col-span-3">
 						{query ? (
-							<div>
-								<p className="text-muted-foreground mb-4">
-									Showing results for &ldquo;{query}&rdquo;...
-								</p>
-								<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-									{/* This would be populated with actual search results */}
-									<Card className="overflow-hidden">
-										<div className="aspect-[2/3] bg-muted/20 flex items-center justify-center">
-											<p className="text-muted-foreground">Result 1</p>
-										</div>
-										<CardContent className="p-4">
-											<h3 className="font-semibold">Book Series Title</h3>
-											<p className="text-sm text-muted-foreground">
-												Author Name
-											</p>
-										</CardContent>
-									</Card>
-									<Card className="overflow-hidden">
-										<div className="aspect-[2/3] bg-muted/20 flex items-center justify-center">
-											<p className="text-muted-foreground">Result 2</p>
-										</div>
-										<CardContent className="p-4">
-											<h3 className="font-semibold">Book Series Title</h3>
-											<p className="text-sm text-muted-foreground">
-												Author Name
-											</p>
-										</CardContent>
-									</Card>
-									<Card className="overflow-hidden">
-										<div className="aspect-[2/3] bg-muted/20 flex items-center justify-center">
-											<p className="text-muted-foreground">Result 3</p>
-										</div>
-										<CardContent className="p-4">
-											<h3 className="font-semibold">Book Series Title</h3>
-											<p className="text-sm text-muted-foreground">
-												Author Name
-											</p>
-										</CardContent>
-									</Card>
-								</div>
-							</div>
+							<SearchResults
+								results={results}
+								isLoading={isLoading}
+								error={error}
+							/>
 						) : (
 							<div className="text-center p-12 border border-dashed rounded-lg">
 								<p className="text-muted-foreground">

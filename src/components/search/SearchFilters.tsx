@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
 	Select,
@@ -12,6 +11,8 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { SearchFilters as ApiSearchFilters } from "@/lib/api/googleBooks";
+import { StableCheckbox } from "./StableCheckbox";
 
 // Sample genre data
 const genres = [
@@ -23,23 +24,50 @@ const genres = [
 	{ id: "historical", label: "Historical Fiction" },
 ];
 
-export function SearchFilters() {
+interface SearchFiltersProps {
+	onFilterChange?: (filters: ApiSearchFilters) => void;
+}
+
+export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
 	const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
 	const [completionStatus, setCompletionStatus] = useState<string>("all");
 	const [sortBy, setSortBy] = useState<string>("relevance");
 
-	const toggleGenre = (genreId: string) => {
-		setSelectedGenres((prev) =>
-			prev.includes(genreId)
-				? prev.filter((id) => id !== genreId)
-				: [...prev, genreId]
-		);
+	// Helper function to notify parent of filter changes
+	const notifyFilterChange = (genres: string[], status: string) => {
+		if (!onFilterChange) return;
+
+		const apiFilters: ApiSearchFilters = {
+			genre: genres,
+			isComplete:
+				status === "complete" ? true : status === "ongoing" ? false : undefined,
+		};
+
+		onFilterChange(apiFilters);
 	};
 
+	// Handle genre checkbox change
+	const handleGenreChange = (genreId: string, checked: boolean) => {
+		const newGenres = checked
+			? [...selectedGenres, genreId]
+			: selectedGenres.filter((id) => id !== genreId);
+
+		setSelectedGenres(newGenres);
+		notifyFilterChange(newGenres, completionStatus);
+	};
+
+	// Handle completion status change
+	const handleStatusChange = (status: string) => {
+		setCompletionStatus(status);
+		notifyFilterChange(selectedGenres, status);
+	};
+
+	// Handle clear filters
 	const clearFilters = () => {
 		setSelectedGenres([]);
 		setCompletionStatus("all");
 		setSortBy("relevance");
+		notifyFilterChange([], "all");
 	};
 
 	return (
@@ -49,10 +77,10 @@ export function SearchFilters() {
 				<div className="space-y-2">
 					{genres.map((genre) => (
 						<div key={genre.id} className="flex items-center space-x-2">
-							<Checkbox
+							<StableCheckbox
 								id={`genre-${genre.id}`}
 								checked={selectedGenres.includes(genre.id)}
-								onCheckedChange={() => toggleGenre(genre.id)}
+								onChange={(checked) => handleGenreChange(genre.id, checked)}
 							/>
 							<Label
 								htmlFor={`genre-${genre.id}`}
@@ -69,7 +97,7 @@ export function SearchFilters() {
 				<h3 className="text-lg font-medium mb-3">Completion Status</h3>
 				<RadioGroup
 					value={completionStatus}
-					onValueChange={setCompletionStatus}
+					onValueChange={handleStatusChange}
 					className="space-y-2"
 				>
 					<div className="flex items-center space-x-2">

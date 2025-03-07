@@ -19,7 +19,7 @@ export function SeriesDetail({ seriesInfo }: SeriesDetailProps) {
 	const renderCompletionStatus = () => {
 		if (seriesInfo.isComplete) {
 			return (
-				<div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-medium">
+				<div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
 					<svg
 						className="w-4 h-4 mr-1.5"
 						fill="currentColor"
@@ -38,7 +38,7 @@ export function SeriesDetail({ seriesInfo }: SeriesDetailProps) {
 		}
 
 		return (
-			<div className="inline-flex items-center px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm font-medium">
+			<div className="inline-flex items-center px-3 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-medium">
 				<svg
 					className="w-4 h-4 mr-1.5"
 					fill="currentColor"
@@ -59,10 +59,10 @@ export function SeriesDetail({ seriesInfo }: SeriesDetailProps) {
 	return (
 		<div className="w-full">
 			<FadeIn>
-				<div className="flex flex-col md:flex-row gap-8 mb-12">
+				<div className="flex flex-col md:flex-row gap-8 mb-16">
 					{/* Cover Image */}
 					<div className="w-full md:w-1/3 lg:w-1/4">
-						<div className="aspect-[2/3] bg-muted rounded-lg overflow-hidden shadow-md">
+						<div className="aspect-[2/3] bg-muted/30 rounded-xl overflow-hidden shadow-md">
 							{seriesInfo.books[0]?.volumeInfo.imageLinks?.thumbnail ? (
 								<Image
 									src={seriesInfo.books[0].volumeInfo.imageLinks.thumbnail}
@@ -70,6 +70,7 @@ export function SeriesDetail({ seriesInfo }: SeriesDetailProps) {
 									width={300}
 									height={450}
 									className="w-full h-full object-cover"
+									priority
 								/>
 							) : (
 								<div className="w-full h-full flex items-center justify-center p-4 text-center">
@@ -81,18 +82,20 @@ export function SeriesDetail({ seriesInfo }: SeriesDetailProps) {
 
 					{/* Series Info */}
 					<div className="flex-1">
-						<h1 className="text-3xl font-bold mb-2">{seriesInfo.name}</h1>
+						<h1 className="text-3xl font-medium mb-2 tracking-tight">
+							{seriesInfo.name}
+						</h1>
 
 						{seriesInfo.books[0]?.volumeInfo.authors && (
-							<p className="text-lg text-muted-foreground mb-4">
+							<p className="text-lg text-muted-foreground mb-5">
 								by {seriesInfo.books[0].volumeInfo.authors.join(", ")}
 							</p>
 						)}
 
-						<div className="mb-6">{renderCompletionStatus()}</div>
+						<div className="mb-8">{renderCompletionStatus()}</div>
 
-						<div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-							<div className="bg-muted/30 p-4 rounded-lg">
+						<div className="grid grid-cols-2 md:grid-cols-3 gap-5 mb-8">
+							<div className="bg-muted/20 p-5 rounded-xl">
 								<h3 className="text-sm font-medium text-muted-foreground mb-1">
 									Total Books
 								</h3>
@@ -101,7 +104,7 @@ export function SeriesDetail({ seriesInfo }: SeriesDetailProps) {
 								</p>
 							</div>
 
-							<div className="bg-muted/30 p-4 rounded-lg">
+							<div className="bg-muted/20 p-5 rounded-xl">
 								<h3 className="text-sm font-medium text-muted-foreground mb-1">
 									Published
 								</h3>
@@ -110,7 +113,7 @@ export function SeriesDetail({ seriesInfo }: SeriesDetailProps) {
 								</p>
 							</div>
 
-							<div className="bg-muted/30 p-4 rounded-lg">
+							<div className="bg-muted/20 p-5 rounded-xl">
 								<h3 className="text-sm font-medium text-muted-foreground mb-1">
 									First Published
 								</h3>
@@ -122,53 +125,55 @@ export function SeriesDetail({ seriesInfo }: SeriesDetailProps) {
 							</div>
 						</div>
 
-						<div className="prose prose-sm max-w-none mb-6">
+						<div className="prose prose-sm max-w-none mb-8 text-muted-foreground leading-relaxed">
 							<p>
 								{seriesInfo.books[0]?.volumeInfo.description ||
 									"No description available."}
 							</p>
 						</div>
 
-						<div className="flex flex-wrap gap-2">
-							<Button>Track Progress</Button>
-							<Button variant="outline">Share Series</Button>
+						<div className="flex flex-wrap gap-3">
+							<Button className="rounded-full px-6">Track Progress</Button>
+							<Button variant="outline" className="rounded-full px-6">
+								Share Series
+							</Button>
 						</div>
 					</div>
 				</div>
 			</FadeIn>
 
 			<FadeIn delay={0.2}>
-				<div className="mb-12">
-					<h2 className="text-2xl font-semibold mb-6">
+				<div className="mb-16">
+					<h2 className="text-2xl font-medium mb-8 tracking-tight">
 						Recommended Reading Order
 					</h2>
 
-					<div className="flex border-b mb-6">
+					<div className="flex border-b mb-8">
 						<button
-							className={`px-4 py-2 font-medium text-sm ${
+							className={`px-5 py-3 font-medium text-sm transition-colors ${
 								activeTab === "chronological"
-									? "border-b-2 border-primary"
-									: "text-muted-foreground"
+									? "border-b-2 border-primary text-foreground"
+									: "text-muted-foreground hover:text-foreground"
 							}`}
 							onClick={() => setActiveTab("chronological")}
 						>
 							Chronological
 						</button>
 						<button
-							className={`px-4 py-2 font-medium text-sm ${
+							className={`px-5 py-3 font-medium text-sm transition-colors ${
 								activeTab === "publication"
-									? "border-b-2 border-primary"
-									: "text-muted-foreground"
+									? "border-b-2 border-primary text-foreground"
+									: "text-muted-foreground hover:text-foreground"
 							}`}
 							onClick={() => setActiveTab("publication")}
 						>
 							Publication Order
 						</button>
 						<button
-							className={`px-4 py-2 font-medium text-sm ${
+							className={`px-5 py-3 font-medium text-sm transition-colors ${
 								activeTab === "recommended"
-									? "border-b-2 border-primary"
-									: "text-muted-foreground"
+									? "border-b-2 border-primary text-foreground"
+									: "text-muted-foreground hover:text-foreground"
 							}`}
 							onClick={() => setActiveTab("recommended")}
 						>
@@ -182,9 +187,11 @@ export function SeriesDetail({ seriesInfo }: SeriesDetailProps) {
 
 			<FadeIn delay={0.4}>
 				<div>
-					<h2 className="text-2xl font-semibold mb-6">Related Series</h2>
+					<h2 className="text-2xl font-medium mb-8 tracking-tight">
+						Related Series
+					</h2>
 
-					<div className="text-center py-8 bg-muted/30 rounded-lg">
+					<div className="text-center py-16 bg-muted/20 rounded-xl">
 						<p className="text-muted-foreground">
 							Related series will appear here
 						</p>
